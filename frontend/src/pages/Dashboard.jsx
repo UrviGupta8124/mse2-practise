@@ -12,22 +12,30 @@ function Dashboard() {
 
   const token = localStorage.getItem("token");
 
-  // 🔹 Fetch expenses
+  // 🚨 BLOCK IF NOT LOGGED IN
+  if (!token) {
+    return <h2>Please login first</h2>;
+  }
+
+  // ✅ FETCH EXPENSES
   const fetchExpenses = async () => {
     try {
-      const res = await axios.get("https://mse2-practise.onrender.com/api/expenses", {
-        headers: {
-          Authorization: `Bearer ${token}`
+      const res = await axios.get(
+        "https://mse2-practise.onrender.com/api/expenses",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
-      });
+      );
 
       setExpenses(res.data);
     } catch (err) {
-      console.log("Fetch Error:", err.response?.data || err.message);
+      console.log("FETCH ERROR:", err.response?.data || err.message);
     }
   };
 
-  // 🔹 Add expense
+  // ✅ ADD EXPENSE
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -36,7 +44,7 @@ function Dashboard() {
         "https://mse2-practise.onrender.com/api/expense",
         {
           ...form,
-          amount: Number(form.amount) // ✅ FIXED
+          amount: Number(form.amount)
         },
         {
           headers: {
@@ -56,8 +64,8 @@ function Dashboard() {
       fetchExpenses();
 
     } catch (err) {
-      console.log("Add Expense Error:", err.response?.data || err.message);
-      alert(err.response?.data?.error || "Error adding expense");
+      console.log("ADD EXPENSE ERROR:", err.response?.data || err.message);
+      alert(err.response?.data?.msg || err.response?.data?.error || "Failed to add expense");
     }
   };
 
@@ -70,39 +78,39 @@ function Dashboard() {
   }, []);
 
   return (
-  <div className="page">
-    <div className="card">
+    <div className="page">
+      <div className="card">
 
-      <h2>💰 Expense Manager</h2>
+        <h2>💰 Expense Manager</h2>
 
-      <form onSubmit={handleSubmit}>
-        <input name="title" placeholder="Title" value={form.title} onChange={handleChange} />
-        <input name="amount" placeholder="Amount" value={form.amount} onChange={handleChange} />
+        <form onSubmit={handleSubmit}>
+          <input name="title" placeholder="Title" value={form.title} onChange={handleChange} />
+          <input name="amount" placeholder="Amount" value={form.amount} onChange={handleChange} />
 
-        <select name="category" value={form.category} onChange={handleChange}>
-          <option value="Food">Food</option>
-          <option value="Travel">Travel</option>
-          <option value="Bills">Bills</option>
-          <option value="Other">Other</option>
-        </select>
+          <select name="category" value={form.category} onChange={handleChange}>
+            <option value="Food">Food</option>
+            <option value="Travel">Travel</option>
+            <option value="Bills">Bills</option>
+            <option value="Other">Other</option>
+          </select>
 
-        <button type="submit">Add Expense</button>
-      </form>
+          <button type="submit">Add Expense</button>
+        </form>
 
-      <hr />
+        <hr />
 
-      <h3>Expenses</h3>
+        <h3>Expenses</h3>
 
-      {expenses.map((exp) => (
-        <div className="expense" key={exp._id}>
-          <span>{exp.title} ({exp.category})</span>
-          <strong>₹{exp.amount}</strong>
-        </div>
-      ))}
+        {expenses.map((exp) => (
+          <div className="expense" key={exp._id}>
+            <span>{exp.title} ({exp.category})</span>
+            <strong>₹{exp.amount}</strong>
+          </div>
+        ))}
 
+      </div>
     </div>
-  </div>
-);
+  );
 }
 
 export default Dashboard;

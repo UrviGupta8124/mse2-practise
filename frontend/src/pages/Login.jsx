@@ -17,36 +17,59 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // ✅ basic frontend validation
+    if (!form.email || !form.password) {
+      alert("Please fill all fields");
+      return;
+    }
+
     try {
       const res = await axios.post(
         "https://mse2-practise.onrender.com/api/auth/login",
         form
       );
 
-      // 🔐 store token
+      if (!res.data?.token) {
+        alert("Login failed: No token received");
+        return;
+      }
+
       localStorage.setItem("token", res.data.token);
 
       alert("Login Successful");
       navigate("/dashboard");
 
     } catch (err) {
-      alert(err.response?.data?.msg || "Error");
+      console.log("LOGIN ERROR:", err.response?.data || err.message);
+
+      alert(err.response?.data?.msg || "Login Failed");
     }
   };
 
   return (
-  <div className="page">
-    <div className="card">
-      <h2>Login</h2>
+    <div className="page">
+      <div className="card">
+        <h2>Login</h2>
 
-      <form onSubmit={handleSubmit}>
-        <input name="email" placeholder="Email" onChange={handleChange} />
-        <input name="password" type="password" placeholder="Password" onChange={handleChange} />
-        <button type="submit">Login</button>
-      </form>
+        <form onSubmit={handleSubmit}>
+          <input
+            name="email"
+            placeholder="Email"
+            onChange={handleChange}
+          />
+
+          <input
+            name="password"
+            type="password"
+            placeholder="Password"
+            onChange={handleChange}
+          />
+
+          <button type="submit">Login</button>
+        </form>
+      </div>
     </div>
-  </div>
-);
+  );
 }
 
 export default Login;

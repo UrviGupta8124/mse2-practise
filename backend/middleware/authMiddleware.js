@@ -8,9 +8,9 @@ const authMiddleware = (req, res, next) => {
       return res.status(401).json({ msg: "No token, authorization denied" });
     }
 
-    // handle both formats safely
+    // ✅ safer token extraction
     const token = authHeader.startsWith("Bearer ")
-      ? authHeader.split(" ")[1]
+      ? authHeader.slice(7).trim()
       : authHeader;
 
     if (!token) {
@@ -19,12 +19,17 @@ const authMiddleware = (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
+    // attach user info
     req.user = decoded;
 
     next();
 
   } catch (error) {
-    return res.status(401).json({ msg: "Token is not valid" });
+    console.log("AUTH ERROR:", error.message);
+
+    return res.status(401).json({
+      msg: "Token is not valid or expired"
+    });
   }
 };
 
