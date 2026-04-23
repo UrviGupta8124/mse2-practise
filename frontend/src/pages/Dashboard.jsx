@@ -15,7 +15,7 @@ function Dashboard() {
   // 🔹 Fetch expenses
   const fetchExpenses = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/expenses", {
+      const res = await axios.get("https://mse2-practise.onrender.com/api/expenses", {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -33,7 +33,7 @@ function Dashboard() {
 
     try {
       await axios.post(
-        "http://localhost:5000/api/expense",
+        "https://mse2-practise.onrender.com/api/expense",
         {
           ...form,
           amount: Number(form.amount) // ✅ FIXED
