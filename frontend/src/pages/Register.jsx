@@ -26,9 +26,9 @@ function Register() {
 
     try {
       const res = await axios.post(
-        "https://mse2-practise.onrender.com/api/auth/register",
-        form
-      );
+  `${API}/api/auth/register`,
+  form
+);
 
       console.log("REGISTER SUCCESS:", res.data);
 
