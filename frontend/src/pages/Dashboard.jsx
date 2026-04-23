@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import API from "../api";
 
 function Dashboard() {
   const [expenses, setExpenses] = useState([]);
@@ -12,22 +13,16 @@ function Dashboard() {
 
   const token = localStorage.getItem("token");
 
-  // 🚨 BLOCK IF NOT LOGGED IN
-  if (!token) {
-    return <h2>Please login first</h2>;
-  }
-
-  // ✅ FETCH EXPENSES
+  // =========================
+  // FETCH EXPENSES
+  // =========================
   const fetchExpenses = async () => {
     try {
-      const res = await axios.get(
-        "https://mse2-practise.onrender.com/api/expenses",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+      const res = await axios.get(`${API}/api/expenses`, {
+        headers: {
+          Authorization: `Bearer ${token}`
         }
-      );
+      });
 
       setExpenses(res.data);
     } catch (err) {
@@ -35,13 +30,20 @@ function Dashboard() {
     }
   };
 
-  // ✅ ADD EXPENSE
+  // =========================
+  // ADD EXPENSE
+  // =========================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!form.title || !form.amount) {
+      alert("Please fill all fields");
+      return;
+    }
+
     try {
       await axios.post(
-        "https://mse2-practise.onrender.com/api/expense",
+        `${API}/api/expense`,
         {
           ...form,
           amount: Number(form.amount)
@@ -73,8 +75,13 @@ function Dashboard() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // =========================
+  // LOAD DATA ON MOUNT
+  // =========================
   useEffect(() => {
-    fetchExpenses();
+    if (token) {
+      fetchExpenses();
+    }
   }, []);
 
   return (
@@ -84,10 +91,25 @@ function Dashboard() {
         <h2>💰 Expense Manager</h2>
 
         <form onSubmit={handleSubmit}>
-          <input name="title" placeholder="Title" value={form.title} onChange={handleChange} />
-          <input name="amount" placeholder="Amount" value={form.amount} onChange={handleChange} />
+          <input
+            name="title"
+            placeholder="Title"
+            value={form.title}
+            onChange={handleChange}
+          />
 
-          <select name="category" value={form.category} onChange={handleChange}>
+          <input
+            name="amount"
+            placeholder="Amount"
+            value={form.amount}
+            onChange={handleChange}
+          />
+
+          <select
+            name="category"
+            value={form.category}
+            onChange={handleChange}
+          >
             <option value="Food">Food</option>
             <option value="Travel">Travel</option>
             <option value="Bills">Bills</option>
@@ -101,12 +123,18 @@ function Dashboard() {
 
         <h3>Expenses</h3>
 
-        {expenses.map((exp) => (
-          <div className="expense" key={exp._id}>
-            <span>{exp.title} ({exp.category})</span>
-            <strong>₹{exp.amount}</strong>
-          </div>
-        ))}
+        {expenses.length === 0 ? (
+          <p>No expenses yet</p>
+        ) : (
+          expenses.map((exp) => (
+            <div className="expense" key={exp._id}>
+              <span>
+                {exp.title} ({exp.category})
+              </span>
+              <strong>₹{exp.amount}</strong>
+            </div>
+          ))
+        )}
 
       </div>
     </div>
